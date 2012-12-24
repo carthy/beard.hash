@@ -135,7 +135,7 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 			h2 ^= k2;
 			h2 = ROTL64(h2, 31);
 			h2 += h1;
-			h2 = 0x38495ab5 + h2 * 5;
+			h2 = 0x38495AB5 + h2 * 5;
 		}
 
 		uint8_t* tail = buf + number * 16;
