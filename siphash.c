@@ -41,8 +41,12 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 {
 	assert(buffer);
 
-	uint64_t v0, v1, v2, v3;
-	uint64_t k0, k1;
+	uint64_t v0;
+	uint64_t v1;
+	uint64_t v2;
+	uint64_t v3;
+	uint64_t k0;
+	uint64_t k1;
 	uint64_t last7;
 
 	k0 = GET64(key, 0);
@@ -57,13 +61,13 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	#define compress(n) \
 		for (size_t i = 0; i < n; i++) { \
 			v0 += v1; v2 += v3; \
-			v1 = ROTL64(v1, 13); v3 = ROTL64(v3, 16); \
+			v1  = ROTL64(v1, 13); v3 = ROTL64(v3, 16); \
 			v1 ^= v0; v3 ^= v2; \
-			v0 = ROTL64(v0, 32); \
+			v0  = ROTL64(v0, 32); \
 			v2 += v1; v0 += v3; \
-			v1 = ROTL64(v1, 17); v3 = ROTL64(v3, 21); \
+			v1  = ROTL64(v1, 17); v3 = ROTL64(v3, 21); \
 			v1 ^= v2; v3 ^= v0; \
-			v2 = ROTL64(v2, 32); \
+			v2  = ROTL64(v2, 32); \
 		}
 
 	size_t i, blocks;
