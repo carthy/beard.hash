@@ -40,7 +40,6 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	uint64_t v0, v1, v2, v3;
 	uint64_t k0, k1;
 	uint64_t last7;
-	hash_t   result;
 
 	k0 = GET64(key, 0);
 	k1 = GET64(key, 8);
@@ -89,7 +88,12 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 
 	#undef compress
 
-	result = v0 ^ v1 ^ v2 ^ v3;
+	uint64_t hash = v0 ^ v1 ^ v2 ^ v3;
 
-	return HASH_BIT != 32 ? ((result >> 32) ^ (result & 0xFFFFFFFF)) : result;
+	if (HASH_BIT == 32) {
+		return ((hash >> 32) ^ (hash & 0xFFFFFFFF));
+	}
+	else {
+		return hash;
+	}
 }
