@@ -81,8 +81,11 @@ crapwow (hash_t seed, void* buffer, size_t length)
 			hi ^= _p >> 64; \
 		})
 
-		#define mixa(in) fold(in, m, k, h)
-		#define mixb(in) fold(in, n, h, k)
+		#define mixa(in) \
+			fold(in, m, k, h)
+
+		#define mixb(in) \
+			fold(in, n, h, k)
 
 		while (length >= 16) {
 			mixb(buf[0]);
