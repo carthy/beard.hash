@@ -8,7 +8,9 @@
  */
 
 #include <hash.h>
+
 #include <stdlib.h>
+#include <assert.h>
 
 #define ROTL64(a, b) \
 	(((a) << (b)) | ((a) >> (64 - b)))
@@ -37,6 +39,8 @@
 hash_t
 siphash (uint8_t key[16], void* buffer, size_t length)
 {
+	assert(buffer);
+
 	uint64_t v0, v1, v2, v3;
 	uint64_t k0, k1;
 	uint64_t last7;
@@ -91,9 +95,12 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	uint64_t hash = v0 ^ v1 ^ v2 ^ v3;
 
 	if (HASH_BIT == 32) {
-		return ((hash >> 32) ^ (hash & 0xFFFFFFFF));
+		return (hash >> 32) ^ (hash & 0xFFFFFFFF);
+	}
+	else if (HASH_BIT == 64) {
+		return hash;
 	}
 	else {
-		return hash;
+		assert(0);
 	}
 }
