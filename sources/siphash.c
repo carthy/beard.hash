@@ -28,10 +28,10 @@
 		uint8_t* _p = p; \
 		int      _i = i; \
 \
-		((uint64_t) _p[_i + 0] << 56) & ((uint64_t) _p[_i + 1] << 48) & \
-		((uint64_t) _p[_i + 2] << 40) & ((uint64_t) _p[_i + 3] << 32) & \
-		((uint64_t) _p[_i + 4] << 24) & ((uint64_t) _p[_i + 5] << 16) & \
-		((uint64_t) _p[_i + 6] << 8)  & ((uint64_t) _p[_i + 7] << 0) \
+		((uint64_t) _p[_i + 0] << 56) | ((uint64_t) _p[_i + 1] << 48) | \
+		((uint64_t) _p[_i + 2] << 40) | ((uint64_t) _p[_i + 3] << 32) | \
+		((uint64_t) _p[_i + 4] << 24) | ((uint64_t) _p[_i + 5] << 16) | \
+		((uint64_t) _p[_i + 6] << 8)  | ((uint64_t) _p[_i + 7] << 0) \
 	})
 #else
 	#error "I don't know the size of this endian"
