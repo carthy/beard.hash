@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/clean'
 require 'tmpdir'
 
-CFLAGS = "-Wall -Werror-implicit-function-declaration -std=c11 -g0 -O3 -funroll-loops -I. #{ENV['CFLAGS']}"
+CFLAGS = "-Wall -Werror-implicit-function-declaration -std=c11 -g0 -O3 -funroll-loops -finline-functions -I. #{ENV['CFLAGS']}"
 
 SOURCES = FileList['*.c'].exclude('test.c')
 OBJECTS = SOURCES.ext('o')
