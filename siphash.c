@@ -15,15 +15,15 @@
 #define ROTL64(a, b) \
 	(((a) << (b)) | ((a) >> (64 - b)))
 
-#if __LITTLE_ENDIAN__
-#	define GET64(p, i) ({ \
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	#define GET64(p, i) ({ \
 		uint8_t* _p = p; \
 		int      _i = i; \
 \
 		*(uint64_t*) (_p + _i); \
 	})
-#elif __BIG_ENDIAN__
-#	define GET64(p, i) ({ \
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	#define GET64(p, i) ({ \
 		uint8_t* _p = p; \
 		int      _i = i; \
 \
@@ -33,7 +33,7 @@
 		((uint64_t) _p[_i + 6] << 8)  & ((uint64_t) _p[_i + 7] << 0) \
 	})
 #else
-#	error "I don't know the size of this endian"
+	#error "I don't know the size of this endian"
 #endif
 
 hash_t
@@ -94,13 +94,11 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 
 	uint64_t hash = v0 ^ v1 ^ v2 ^ v3;
 
-	if (HASH_BIT == 32) {
+	#if HASH_BIT == 32
 		return (hash >> 32) ^ (hash & 0xFFFFFFFF);
-	}
-	else if (HASH_BIT == 64) {
+	#elif HASH_BIT == 64
 		return hash;
-	}
-	else {
-		assert(0);
-	}
+	#else
+		#error "Why can't I hold so many bits?"
+	#endif
 }
