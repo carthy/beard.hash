@@ -14,6 +14,6 @@
 
 typedef unsigned long hash_t;
 
-#define HASH_BIT (sizeof(hash_t) * CHAR_BIT)
+#define HASH_BIT (__SIZEOF_LONG__ * CHAR_BIT)
 
 hash_t siphash (uint8_t key[16], void* buffer, size_t length);
