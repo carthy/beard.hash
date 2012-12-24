@@ -7,7 +7,8 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <hash.h>
+#include <common.h>
+#include <siphash.h>
 
 #include <stdlib.h>
 #include <assert.h>

@@ -2,34 +2,64 @@ require 'rake'
 require 'rake/clean'
 require 'tmpdir'
 
-CFLAGS = "-Wall -Werror-implicit-function-declaration -std=c11 -g0 -O3 -funroll-loops -finline-functions -I. #{ENV['CFLAGS']}"
+CFLAGS = "-Wall -Werror-implicit-function-declaration -std=c11 -Iinclude #{ENV['CFLAGS']}"
 
-SOURCES = FileList['*.c'].exclude('test.c')
+SOURCES = FileList['sources/*.c']
 OBJECTS = SOURCES.ext('o')
 
 CLEAN.include(OBJECTS)
-CLOBBER.include('hash.a', 'test-it')
+CLOBBER.include('hash.a', 'hash.h')
 
-task :default => 'build:hash'
+task :default => :build
 
-task :test => 'build:test' do
-	sh './test-it'
+task :build, :mode do |t, args|
+	mode = (args[:mode] || :debug).to_sym
+
+	if mode == :debug
+		CFLAGS << ' -O0 -g3'
+	else
+		CFLAGS << ' -g0 -O3 -funroll-loops -finline-functions -DNDEBUG'
+	end
+
+	Rake::Task['build:hash'].invoke
 end
 
 namespace :build do
-	task :hash => 'hash.a'
-
-	task :test => 'test-it'
+	task :hash => ['hash.a', 'hash.h']
 
 	file 'hash.a' => OBJECTS do
 		sh "ar rcs hash.a #{OBJECTS}"
 	end
 
-	file 'test-it' => OBJECTS do
-		sh "clang #{CFLAGS} #{OBJECTS} test.c -o test-it"
+	file 'hash.h' => FileList['include/*.h'] do
+		header = File.read('include/common.h')
+
+		%w[siphash crapwow].each {|name|
+			header << File.read("include/#{name}.h").sub(/\A.*\*\/\n/m, '')
+		}
+
+		File.open('hash.h', 'w') {|f|
+			f.puts(header)
+		}
+	end
+end
+
+task :test => 'test:run'
+
+namespace :test do
+	task :build => 'test/run'
+
+	task :run => 'test:build' do
+		sh 'test/run'
+	end
+
+	file 'test/run' => ['hash.a', 'hash.h'] do
+		sh "clang #{CFLAGS} -I. -o test/run test/run.c hash.a"
 	end
 end
 
 rule '.o' => '.c' do |t|
 	sh "clang #{CFLAGS} -o #{t.name} -c #{t.source}"
 end
+
+rule '.h'
