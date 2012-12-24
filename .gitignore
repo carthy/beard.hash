@@ -1,3 +1,4 @@
 *.o
-test-it
+test/run
 hash.a
+hash.h
