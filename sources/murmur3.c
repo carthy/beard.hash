@@ -72,7 +72,7 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 		uint32_t c1     = 0xCC9E2D51;
 		uint32_t c2     = 0x1B873593;
 
-		uint32_t* blocks = (uint32_t*) (buf + (number * 4))
+		uint32_t* blocks = (uint32_t*) (buf + (number * 4));
 		for (int i = -number; i < 0; i++) {
 			uint32_t k1 = GET32(blocks, i);
 
@@ -85,9 +85,9 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 			h1  = 0xE6546B64 + (h1 * 5);
 		}
 
-		uint8_t* tail = buf + (number * 4);
 		{
-			uint32_t k1 = 0;
+			uint8_t* tail = buf + (number * 4);
+			uint32_t k1   = 0;
 
 			switch (length & 3) {
 				case 3:
@@ -138,10 +138,10 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 			h2 = 0x38495AB5 + h2 * 5;
 		}
 
-		uint8_t* tail = buf + number * 16;
 		{
-			uint64_t k1 = 0;
-			uint64_t k2 = 0;
+			uint8_t* tail = buf + number * 16;
+			uint64_t k1   = 0;
+			uint64_t k2   = 0;
 
 			switch (length & 15) {
 				case 15:
