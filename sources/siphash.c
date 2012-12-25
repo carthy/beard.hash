@@ -82,16 +82,27 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 		v0 ^= GET64(buffer, i);
 	}
 
-	uint8_t* buf = buffer;
-	switch (length - blocks) {
-		case 7: last7 |= ((uint64_t) buf[i + 6] << 48);
-		case 6: last7 |= ((uint64_t) buf[i + 5] << 40);
-		case 5: last7 |= ((uint64_t) buf[i + 4] << 32);
-		case 4: last7 |= ((uint64_t) buf[i + 3] << 24);
-		case 3: last7 |= ((uint64_t) buf[i + 2] << 16);
-		case 2: last7 |= ((uint64_t) buf[i + 1] <<  8);
-		case 1: last7 |= ((uint64_t) buf[i + 0]);
+	#if __BYTE_ORDER_ == __ORDER_LITTLE_ENDIAN
+		#define INDEX_FOR(n) n
+	#elif __BYTE_ORDER__ == __ORDER_BIG__ENDIAN__
+		#define INDEX_FOR(n) -(n - 6)
+	#else
+		#error "I don't know the size of this endian"
+	#endif
+	{
+		uint8_t* buf = buffer;
+
+		switch (length - blocks) {
+			case 7: last7 |= ((uint64_t) buf[i + INDEX_FOR(6)] << 48);
+			case 6: last7 |= ((uint64_t) buf[i + INDEX_FOR(5)] << 40);
+			case 5: last7 |= ((uint64_t) buf[i + INDEX_FOR(4)] << 32);
+			case 4: last7 |= ((uint64_t) buf[i + INDEX_FOR(3)] << 24);
+			case 3: last7 |= ((uint64_t) buf[i + INDEX_FOR(2)] << 16);
+			case 2: last7 |= ((uint64_t) buf[i + INDEX_FOR(1)] <<  8);
+			case 1: last7 |= ((uint64_t) buf[i + INDEX_FOR(0)]);
+		}
 	}
+	#undef INDEX_FOR
 
 	v3 ^= last7;
 	rounds(2);
@@ -228,6 +239,14 @@ siphash_t*
 siphash_finalize (siphash_t* self)
 {
 	uint64_t last7 = (self->length & 0xFFull) << 56;
+
+	#if __BYTE_ORDER_ == __ORDER_LITTLE_ENDIAN
+		#define INDEX_FOR(n) n
+	#elif __BYTE_ORDER__ == __ORDER_BIG__ENDIAN__
+		#define INDEX_FOR(n) -(n - 6)
+	#else
+		#error "I don't know the size of this endian"
+	#endif
 	switch (self->remaining) {
 		case 7: last7 |= ((uint64_t) self->remainder[6] << 48);
 		case 6: last7 |= ((uint64_t) self->remainder[5] << 40);
@@ -237,6 +256,7 @@ siphash_finalize (siphash_t* self)
 		case 2: last7 |= ((uint64_t) self->remainder[1] <<  8);
 		case 1: last7 |= ((uint64_t) self->remainder[0]);
 	}
+	#undef INDEX_FOR
 
 	self->v[3] ^= last7;
 	rounds(self, self->compression);
