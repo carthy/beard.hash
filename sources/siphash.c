@@ -113,3 +113,156 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 		#error "Why can't I hold so many bits?"
 	#endif
 }
+
+struct siphash_t {
+	int compression;
+	int finalization;
+
+	uint64_t v[4];
+	size_t   length;
+
+	uint8_t remainder[8];
+	uint8_t remaining;
+
+	hash_t hash;
+};
+
+siphash_t*
+siphash_new (void)
+{
+	siphash_t* self = malloc(sizeof(siphash_t));
+
+	return self;
+}
+
+void
+siphash_free (siphash_t* self)
+{
+	free(self);
+}
+
+siphash_t*
+siphash_init (siphash_t* self, uint8_t key[16], int compression, int finalization)
+{
+	uint64_t k0 = GET64(key, 0);
+	uint64_t k1 = GET64(key, 8);
+
+	self->v[0] = k0 ^ 0x736F6D6570736575ull;
+	self->v[1] = k1 ^ 0x646F72616E646F6Dull;
+	self->v[2] = k0 ^ 0x6C7967656E657261ull;
+	self->v[3] = k1 ^ 0x7465646279746573ull;
+
+	self->length = 0;
+
+	self->compression  = compression;
+	self->finalization = finalization;
+
+	self->remaining = 0;
+
+	self->hash = 0;
+
+	return self;
+}
+
+siphash_t*
+siphash_init_default (siphash_t* self, uint8_t key[16])
+{
+	return siphash_init(self, key, 2, 4);
+}
+
+#define round(state) \
+	state->v[0] += state->v[1]; state->v[2] += state->v[3]; \
+	state->v[1]  = ROTL64(state->v[1], 13); state->v[3] = ROTL64(state->v[3], 16); \
+	state->v[1] ^= state->v[0]; state->v[3] ^= state->v[2]; \
+	state->v[0]  = ROTL64(state->v[0], 32); \
+	state->v[2] += state->v[1]; state->v[0] += state->v[3]; \
+	state->v[1]  = ROTL64(state->v[1], 17); state->v[3] = ROTL64(state->v[3], 21); \
+	state->v[1] ^= state->v[2]; state->v[3] ^= state->v[0]; \
+	state->v[2]  = ROTL64(state->v[2], 32)
+
+#define rounds(state, n) \
+	for (size_t i = 0; i < n; i++) { \
+		round(state); \
+	}
+
+siphash_t*
+siphash_update (siphash_t* self, void* buffer, size_t length)
+{
+	self->length += length;
+
+	if (self->remaining > 0) {
+		if (length < 8 - self->remaining) {
+			memcpy(self->remainder + self->remaining, buffer, length);
+			self->remaining += length;
+
+			return self;
+		}
+		else {
+			size_t fill = length - (8 - self->remaining);
+
+			memcpy(self->remainder + self->remaining, buffer, fill);
+
+			self->v[3] ^= GET64(self->remainder, 0);
+			rounds(self, self->compression);
+			self->v[0] ^= GET64(self->remainder, 0);
+
+			self->remaining  = 0;
+			length          -= fill;
+		}
+	}
+
+	size_t i, blocks;
+	for (i = 0, blocks = length & ~7; i < blocks; i += 8) {
+		self->v[3] ^= GET64(buffer, i);
+		rounds(self, self->compression);
+		self->v[0] ^= GET64(buffer, i);
+	}
+
+	self->remaining = length - blocks;
+	memcpy(self->remainder, buffer + blocks, self->remaining);
+
+	return self;
+}
+
+siphash_t*
+siphash_finalize (siphash_t* self)
+{
+	uint64_t last7 = (self->length & 0xFFull) << 56;
+	switch (self->remaining) {
+		case 7: last7 |= ((uint64_t) self->remainder[6] << 48);
+		case 6: last7 |= ((uint64_t) self->remainder[5] << 40);
+		case 5: last7 |= ((uint64_t) self->remainder[4] << 32);
+		case 4: last7 |= ((uint64_t) self->remainder[3] << 24);
+		case 3: last7 |= ((uint64_t) self->remainder[2] << 16);
+		case 2: last7 |= ((uint64_t) self->remainder[1] <<  8);
+		case 1: last7 |= ((uint64_t) self->remainder[0]);
+	}
+
+	self->v[3] ^= last7;
+	rounds(self, self->compression);
+	self->v[0] ^= last7;
+
+	self->v[2] ^= 0xFF;
+	rounds(self, self->finalization);
+
+	uint64_t hash = self->v[0] ^ self->v[1] ^ self->v[2] ^ self->v[3];
+
+	#if HASH_BIT == 32
+		self->hash = (hash >> 32) ^ (hash & 0xFFFFFFFF);
+	#elif HASH_BIT == 64
+		self->hash = hash;
+	#else
+		#error "Why can't I hold so many bits?"
+	#endif
+
+	return self;
+}
+
+#undef round
+#undef rounds
+
+hash_t
+siphash_fetch (siphash_t* self)
+{
+	return self->hash;
+}
