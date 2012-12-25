@@ -54,7 +54,7 @@ crapwow (hash_t seed, void* buffer, size_t length)
 		}
 
 		if (length != 0) {
-			mixa(buf[0] & ((1 << (length * 8)) - 1))
+			mixa(buf[0] & ((1 << (length * 8)) - 1));
 		}
 
 		mixb(h ^ (k + n));
