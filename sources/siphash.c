@@ -52,6 +52,7 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 
 	k0 = GET64(key, 0);
 	k1 = GET64(key, 8);
+
 	v0 = k0 ^ 0x736F6D6570736575ull;
 	v1 = k1 ^ 0x646F72616E646F6Dull;
 	v2 = k0 ^ 0x6C7967656E657261ull;
@@ -59,22 +60,25 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 
 	last7 = (length & 0xFFull) << 56;
 
-	#define compress(n) \
+	#define round() \
+		v0 += v1; v2 += v3; \
+		v1  = ROTL64(v1, 13); v3 = ROTL64(v3, 16); \
+		v1 ^= v0; v3 ^= v2; \
+		v0  = ROTL64(v0, 32); \
+		v2 += v1; v0 += v3; \
+		v1  = ROTL64(v1, 17); v3 = ROTL64(v3, 21); \
+		v1 ^= v2; v3 ^= v0; \
+		v2  = ROTL64(v2, 32)
+
+	#define rounds(n) \
 		for (size_t i = 0; i < n; i++) { \
-			v0 += v1; v2 += v3; \
-			v1  = ROTL64(v1, 13); v3 = ROTL64(v3, 16); \
-			v1 ^= v0; v3 ^= v2; \
-			v0  = ROTL64(v0, 32); \
-			v2 += v1; v0 += v3; \
-			v1  = ROTL64(v1, 17); v3 = ROTL64(v3, 21); \
-			v1 ^= v2; v3 ^= v0; \
-			v2  = ROTL64(v2, 32); \
+			round(); \
 		}
 
 	size_t i, blocks;
 	for (i = 0, blocks = length & ~7; i < blocks; i += 8) {
 		v3 ^= GET64(buffer, i);
-		compress(2);
+		rounds(2);
 		v0 ^= GET64(buffer, i);
 	}
 
@@ -90,12 +94,14 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	}
 
 	v3 ^= last7;
-	compress(2);
+	rounds(2);
 	v0 ^= last7;
-	v2 ^= 0xff;
-	compress(4);
 
-	#undef compress
+	v2 ^= 0xff;
+	rounds(4);
+
+	#undef round
+	#undef rounds
 
 	uint64_t hash = v0 ^ v1 ^ v2 ^ v3;
 
