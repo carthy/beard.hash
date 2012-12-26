@@ -65,6 +65,8 @@ fmix64 (uint64_t h)
 hash_t
 murmur3 (hash_t seed, void* buffer, size_t length)
 {
+	assert(buffer);
+
 	#if HASH_BIT == 32
 		uint8_t* buf    = buffer;
 		int      number = length / 4;
