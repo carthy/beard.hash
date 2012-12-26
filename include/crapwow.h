@@ -7,7 +7,7 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-hash_t crapwow (hash_t seed, void* buffer, size_t length);
+hash_t crapwow (hash_t seed, const void* buffer, size_t length);
 
 #define crapwow_with(seed, data) ({ \
 	typeof (data) _data = data; \

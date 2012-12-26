@@ -7,7 +7,7 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-hash_t murmur3 (hash_t seed, void* buffer, size_t length);
+hash_t murmur3 (hash_t seed, const void* buffer, size_t length);
 
 typedef struct murmur3_t murmur3_t;
 
@@ -19,7 +19,7 @@ murmur3_t* murmur3_init (murmur3_t* self, hash_t seed);
 
 murmur3_t* murmur3_init_default (murmur3_t* self);
 
-murmur3_t* murmur3_update (murmur3_t* self, void* buffer, size_t length);
+murmur3_t* murmur3_update (murmur3_t* self, const void* buffer, size_t length);
 
 #define murmur3_update_with(self, data) ({ \
 	typeof (data) _data = data; \
