@@ -9,6 +9,12 @@
 
 hash_t siphash (const uint8_t key[16], const void* buffer, size_t length);
 
+#define siphash_with(key, data) ({ \
+	typeof (data) _data = data; \
+\
+	siphash(key, &_data, sizeof(_data)); \
+})
+
 typedef struct siphash_t siphash_t;
 
 siphash_t* siphash_new (void);
