@@ -34,7 +34,7 @@ namespace :build do
 	file 'hash.h' => FileList['include/*.h'] do
 		header = File.read('include/common.h')
 
-		%w[siphash crapwow].each {|name|
+		%w[siphash crapwow murmur3].each {|name|
 			header << File.read("include/#{name}.h").sub(/\A.*\*\/\n/m, '')
 		}
 
