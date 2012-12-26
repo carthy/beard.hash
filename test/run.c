@@ -11,7 +11,7 @@ main (int argc, char* argv[])
 
 		siphash_init_default(sip, key);
 		siphash_update(sip, data, 20);
-		siphash_finalize(sip);
+		siphash_final(sip);
 
 		printf("siphash:             %lu\n", siphash(key, data, 20));
 		printf("siphash (streaming): %lu\n", siphash_fetch(sip));
