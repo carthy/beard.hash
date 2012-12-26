@@ -34,9 +34,9 @@ static inline uint64_t
 fmix64 (uint64_t h)
 {
   h ^= h >> 33;
-  h *= 0xFF51AFD7ED558CCDul;
+  h *= 0xFF51AFD7ED558CCDull;
   h ^= h >> 33;
-  h *= 0xC4CEB9FE1A85EC53ul;
+  h *= 0xC4CEB9FE1A85EC53ull;
   h ^= h >> 33;
 
   return h;
