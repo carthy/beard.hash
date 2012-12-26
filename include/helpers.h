@@ -23,17 +23,17 @@
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	#define GET32(p, i) ({ \
-		uint32_t* _p = (uint32_t*) p; \
-		int       _i = i; \
+		uint8_t* _p = (uint8_t*) p; \
+		int      _i = i; \
 	\
-		_p[_i]; \
+		*(uint32_t*) _p + _i; \
 	})
 	
 	#define GET64(p, i) ({ \
-		uint64_t* _p = (uint64_t*) p; \
-		int       _i = i; \
+		uint8_t* _p = (uint8_t*) p; \
+		int      _i = i; \
 	\
-		_p[_i]; \
+		*(uint64_t*) _p + _i; \
 	})
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	#define GET32(p, i) ({ \
