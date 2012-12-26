@@ -58,13 +58,10 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 		for (int i = -number; i < 0; i++) {
 			uint32_t k1 = GET32(blocks, i);
 
-			k1 *= c1;
-			k1  = ROTL32(k1, 15);
-			k1 *= c2;
+			k1 *= c1; k1 = ROTL32(k1, 15); k1 *= c2;
+			h1 ^= k1; h1 = ROTL32(h1, 13);
 
-			h1 ^= k1;
-			h1  = ROTL32(h1, 13);
-			h1  = 0xE6546B64 + (h1 * 5);
+			h1 = 0xE6546B64 + (h1 * 5);
 		}
 
 		{
