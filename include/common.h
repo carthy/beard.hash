@@ -14,4 +14,6 @@
 
 typedef unsigned long hash_t;
 
-#define HASH_BIT (__SIZEOF_LONG__ * CHAR_BIT)
+#define __SIZEOF_HASH__ __SIZEOF_LONG__
+
+#define HASH_BIT (__SIZEOF_HASH__ * CHAR_BIT)
