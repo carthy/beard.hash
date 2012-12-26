@@ -233,13 +233,13 @@ siphash_final (siphash_t* self)
 		{
 			uint64_t last7 = (self->length & 0xFFull) << 56;
 			switch (self->remaining) {
-				case 7: last7 |= ((uint64_t) self->remainder[6] << 48);
-				case 6: last7 |= ((uint64_t) self->remainder[5] << 40);
-				case 5: last7 |= ((uint64_t) self->remainder[4] << 32);
-				case 4: last7 |= ((uint64_t) self->remainder[3] << 24);
-				case 3: last7 |= ((uint64_t) self->remainder[2] << 16);
-				case 2: last7 |= ((uint64_t) self->remainder[1] <<  8);
-				case 1: last7 |= ((uint64_t) self->remainder[0]);
+				case 7: last7 |= ((uint64_t) self->remainder[INDEX_FOR(6)] << 48);
+				case 6: last7 |= ((uint64_t) self->remainder[INDEX_FOR(5)] << 40);
+				case 5: last7 |= ((uint64_t) self->remainder[INDEX_FOR(4)] << 32);
+				case 4: last7 |= ((uint64_t) self->remainder[INDEX_FOR(3)] << 24);
+				case 3: last7 |= ((uint64_t) self->remainder[INDEX_FOR(2)] << 16);
+				case 2: last7 |= ((uint64_t) self->remainder[INDEX_FOR(1)] <<  8);
+				case 1: last7 |= ((uint64_t) self->remainder[INDEX_FOR(0)]);
 			}
 
 			self->v[3] ^= last7;
