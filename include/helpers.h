@@ -54,5 +54,5 @@
 		((uint64_t) _p[_i + 6] << 8)  | ((uint64_t) _p[_i + 7] << 0) \
 	})
 #else
-	#error "I don't know the size of this endian"
+	#error "I don't see any huge endian"
 #endif
