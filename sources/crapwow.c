@@ -118,4 +118,3 @@ crapwow (hash_t seed, void* buffer, size_t length)
 		#error "Why can't I hold so many bits?"
 	#endif
 }
-
