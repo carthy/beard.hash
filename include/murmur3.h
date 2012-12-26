@@ -9,6 +9,12 @@
 
 hash_t murmur3 (hash_t seed, const void* buffer, size_t length);
 
+#define murmur3_with(seed, data) ({ \
+	typeof (data) _data = data; \
+\
+	murmur3(seed, &_data, sizeof(_data)); \
+})
+
 typedef struct murmur3_t murmur3_t;
 
 murmur3_t* murmur3_new (void);
