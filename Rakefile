@@ -53,9 +53,11 @@ namespace :test do
 		sh 'test/run'
 	end
 
-	file 'test/run' => ['hash.a', 'hash.h'] do
+	file 'test/run' => ['run.c', 'hash.a', 'hash.h'] do
 		sh "clang #{CFLAGS} -I. -o test/run test/run.c hash.a"
 	end
+
+	file 'run.c'
 end
 
 rule '.o' => '.c' do |t|
