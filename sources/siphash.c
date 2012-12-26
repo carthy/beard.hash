@@ -24,7 +24,6 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	uint64_t v3;
 	uint64_t k0;
 	uint64_t k1;
-	uint64_t last7;
 
 	k0 = GET64(key, 0);
 	k1 = GET64(key, 8);
@@ -33,8 +32,6 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	v1 = k1 ^ 0x646F72616E646F6Dull;
 	v2 = k0 ^ 0x6C7967656E657261ull;
 	v3 = k1 ^ 0x7465646279746573ull;
-
-	last7 = (length & 0xFFull) << 56;
 
 	#define round() \
 		v0 += v1; v2 += v3; \
@@ -66,7 +63,8 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 		#error "I don't know the size of this endian"
 	#endif
 	{
-		uint8_t* buf = buffer;
+		uint64_t last7 = (length & 0xFFull) << 56;
+		uint8_t* buf   = buffer;
 
 		switch (length - blocks) {
 			case 7: last7 |= ((uint64_t) buf[i + INDEX_FOR(6)] << 48);
@@ -77,12 +75,12 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 			case 2: last7 |= ((uint64_t) buf[i + INDEX_FOR(1)] <<  8);
 			case 1: last7 |= ((uint64_t) buf[i + INDEX_FOR(0)]);
 		}
+
+		v3 ^= last7;
+		rounds(2);
+		v0 ^= last7;
 	}
 	#undef INDEX_FOR
-
-	v3 ^= last7;
-	rounds(2);
-	v0 ^= last7;
 
 	v2 ^= 0xff;
 	rounds(4);
