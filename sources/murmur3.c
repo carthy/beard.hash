@@ -43,7 +43,7 @@ fmix64 (uint64_t h)
 }
 
 hash_t
-murmur3 (hash_t seed, void* buffer, size_t length)
+murmur3 (hash_t seed, const void* buffer, size_t length)
 {
 	assert(buffer);
 
@@ -121,7 +121,7 @@ murmur3 (hash_t seed, void* buffer, size_t length)
 			#error "I don't know the size of this endian"
 		#endif
 		{
-			uint8_t* buf = buffer;
+			uint8_t* buf = (uint8_t*) buffer;
 			uint64_t k1  = 0;
 			uint64_t k2  = 0;
 
@@ -235,7 +235,7 @@ murmur3_init_default (murmur3_t* self)
 }
 
 murmur3_t*
-murmur3_update (murmur3_t* self, void* buffer, size_t length)
+murmur3_update (murmur3_t* self, const void* buffer, size_t length)
 {
 	assert(self);
 	assert(buffer);

@@ -14,7 +14,7 @@
 #include <assert.h>
 
 hash_t
-crapwow (hash_t seed, void* buffer, size_t length)
+crapwow (hash_t seed, const void* buffer, size_t length)
 {
 	#if HASH_BIT == 32
 		uint32_t  m   = 0x57559429;
@@ -69,7 +69,7 @@ crapwow (hash_t seed, void* buffer, size_t length)
 
 		uint64_t  m   = 0x95B47AA3355BA1A1;
 		uint64_t  n   = 0x8A970BE7488FDA55;
-		uint64_t* buf = buffer;
+		uint64_t* buf = (uint64_t*) buffer;
 		uint64_t  h   = length;
 		uint64_t  k   = length + seed + n;
 

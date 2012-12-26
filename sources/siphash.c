@@ -14,7 +14,7 @@
 #include <assert.h>
 
 hash_t
-siphash (uint8_t key[16], void* buffer, size_t length)
+siphash (const uint8_t key[16], const void* buffer, size_t length)
 {
 	assert(buffer);
 
@@ -64,7 +64,7 @@ siphash (uint8_t key[16], void* buffer, size_t length)
 	#endif
 	{
 		uint64_t last7 = (length & 0xFFull) << 56;
-		uint8_t* buf   = buffer;
+		uint8_t* buf   = (uint8_t*) buffer;
 
 		switch (length - blocks) {
 			case 7: last7 |= ((uint64_t) buf[i + INDEX_FOR(6)] << 48);
@@ -127,7 +127,7 @@ siphash_free (siphash_t* self)
 }
 
 siphash_t*
-siphash_init (siphash_t* self, uint8_t key[16], int compression, int finalization)
+siphash_init (siphash_t* self, const uint8_t key[16], int compression, int finalization)
 {
 	assert(self);
 
@@ -152,7 +152,7 @@ siphash_init (siphash_t* self, uint8_t key[16], int compression, int finalizatio
 }
 
 siphash_t*
-siphash_init_default (siphash_t* self, uint8_t key[16])
+siphash_init_default (siphash_t* self, const uint8_t key[16])
 {
 	return siphash_init(self, key, 2, 4);
 }
@@ -173,7 +173,7 @@ siphash_init_default (siphash_t* self, uint8_t key[16])
 	}
 
 siphash_t*
-siphash_update (siphash_t* self, void* buffer, size_t length)
+siphash_update (siphash_t* self, const void* buffer, size_t length)
 {
 	assert(self);
 	assert(buffer);
