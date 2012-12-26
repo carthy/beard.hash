@@ -222,8 +222,6 @@ siphash_final (siphash_t* self)
 {
 	assert(self);
 
-	uint64_t last7 = (self->length & 0xFFull) << 56;
-
 	#if __BYTE_ORDER_ == __ORDER_LITTLE_ENDIAN
 		#define INDEX_FOR(n) n
 	#elif __BYTE_ORDER__ == __ORDER_BIG__ENDIAN__
@@ -231,20 +229,23 @@ siphash_final (siphash_t* self)
 	#else
 		#error "I don't know the size of this endian"
 	#endif
-	switch (self->remaining) {
-		case 7: last7 |= ((uint64_t) self->remainder[6] << 48);
-		case 6: last7 |= ((uint64_t) self->remainder[5] << 40);
-		case 5: last7 |= ((uint64_t) self->remainder[4] << 32);
-		case 4: last7 |= ((uint64_t) self->remainder[3] << 24);
-		case 3: last7 |= ((uint64_t) self->remainder[2] << 16);
-		case 2: last7 |= ((uint64_t) self->remainder[1] <<  8);
-		case 1: last7 |= ((uint64_t) self->remainder[0]);
+	{
+		uint64_t last7 = (self->length & 0xFFull) << 56;
+		switch (self->remaining) {
+			case 7: last7 |= ((uint64_t) self->remainder[6] << 48);
+			case 6: last7 |= ((uint64_t) self->remainder[5] << 40);
+			case 5: last7 |= ((uint64_t) self->remainder[4] << 32);
+			case 4: last7 |= ((uint64_t) self->remainder[3] << 24);
+			case 3: last7 |= ((uint64_t) self->remainder[2] << 16);
+			case 2: last7 |= ((uint64_t) self->remainder[1] <<  8);
+			case 1: last7 |= ((uint64_t) self->remainder[0]);
+		}
+
+		self->v[3] ^= last7;
+		rounds(self, self->compression);
+		self->v[0] ^= last7;
 	}
 	#undef INDEX_FOR
-
-	self->v[3] ^= last7;
-	rounds(self, self->compression);
-	self->v[0] ^= last7;
 
 	self->v[2] ^= 0xFF;
 	rounds(self, self->finalization);
