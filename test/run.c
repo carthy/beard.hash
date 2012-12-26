@@ -9,6 +9,8 @@ main (int argc, char* argv[])
 		uint8_t    data[20] = {0};
 		siphash_t* sip      = siphash_new();
 
+		siphash_with(key, sip);
+
 		siphash_init_default(sip, key);
 		siphash_update(sip, data, 10);
 		siphash_update(sip, data + 10, 10);
@@ -23,6 +25,8 @@ main (int argc, char* argv[])
 		hash_t     seed     = 0;
 		uint8_t    data[20] = {0};
 		murmur3_t* mur      = murmur3_new();
+
+		murmur3_with(seed, mur);
 
 		murmur3_init(mur, seed);
 		murmur3_update(mur, data, 10);
