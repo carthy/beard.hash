@@ -245,7 +245,7 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 }
 
 siphash_t*
-siphash_finalize (siphash_t* self)
+siphash_final (siphash_t* self)
 {
 	assert(self);
 

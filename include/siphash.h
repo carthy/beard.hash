@@ -27,6 +27,6 @@ siphash_t* siphash_update (siphash_t* self, void* buffer, size_t length);
 	siphash_update(self, &_data, sizeof(_data)); \
 })
 
-siphash_t* siphash_finalize (siphash_t* self);
+siphash_t* siphash_final (siphash_t* self);
 
 hash_t siphash_fetch (siphash_t* self);
