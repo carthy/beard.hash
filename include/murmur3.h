@@ -10,7 +10,7 @@
 hash_t murmur3 (hash_t seed, const void* buffer, size_t length);
 
 #define murmur3_with(seed, data) ({ \
-	typeof (data) _data = data; \
+	__typeof__(data) _data = data; \
 \
 	murmur3(seed, &_data, sizeof(_data)); \
 })
@@ -28,7 +28,7 @@ murmur3_t* murmur3_init_default (murmur3_t* self);
 murmur3_t* murmur3_update (murmur3_t* self, const void* buffer, size_t length);
 
 #define murmur3_update_with(self, data) ({ \
-	typeof (data) _data = data; \
+	__typeof__(data) _data = data; \
 \
 	murmur3_update(self, &_data, sizeof(_data)); \
 })

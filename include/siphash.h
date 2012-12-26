@@ -10,7 +10,7 @@
 hash_t siphash (const uint8_t key[16], const void* buffer, size_t length);
 
 #define siphash_with(key, data) ({ \
-	typeof (data) _data = data; \
+	__typeof__(data) _data = data; \
 \
 	siphash(key, &_data, sizeof(_data)); \
 })
@@ -28,7 +28,7 @@ siphash_t* siphash_init_default (siphash_t* self, const uint8_t key[16]);
 siphash_t* siphash_update (siphash_t* self, const void* buffer, size_t length);
 
 #define siphash_update_with(self, data) ({ \
-	typeof (data) _data = data; \
+	__typeof__(data) _data = data; \
 \
 	siphash_update(self, &_data, sizeof(_data)); \
 })

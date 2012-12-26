@@ -10,7 +10,7 @@
 hash_t crapwow (hash_t seed, const void* buffer, size_t length);
 
 #define crapwow_with(seed, data) ({ \
-	typeof (data) _data = data; \
+	__typeof__(data) _data = data; \
 \
 	crapwow(seed, &_data, sizeof(_data)); \
 })
