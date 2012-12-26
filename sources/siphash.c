@@ -194,7 +194,7 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 			return self;
 		}
 
-		size_t fill = length - (8 - self->remaining);
+		size_t fill = 8 - self->remaining;
 		memcpy(self->remainder + self->remaining, buffer, fill);
 
 		self->v[3] ^= GET64(self->remainder, 0);
@@ -203,6 +203,7 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 
 		self->remaining  = 0;
 		length          -= fill;
+		buffer          += fill;
 	}
 
 	size_t i, blocks;
