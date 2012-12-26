@@ -8,3 +8,9 @@
  */
 
 hash_t crapwow (hash_t seed, void* buffer, size_t length);
+
+#define crapwow_with(seed, data) ({ \
+	typeof (data) _data = data; \
+\
+	crapwow(seed, &_data, sizeof(_data)); \
+})
