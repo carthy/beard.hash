@@ -132,8 +132,8 @@ struct siphash_t {
 	uint64_t v[4];
 	size_t   length;
 
-	uint8_t remainder[8];
 	uint8_t remaining;
+	uint8_t remainder[8];
 
 	hash_t hash;
 };
@@ -141,9 +141,7 @@ struct siphash_t {
 siphash_t*
 siphash_new (void)
 {
-	siphash_t* self = malloc(sizeof(siphash_t));
-
-	return self;
+	return malloc(sizeof(siphash_t));
 }
 
 void
