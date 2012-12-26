@@ -18,10 +18,10 @@
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	#define GET64(p, i) ({ \
-		uint8_t* _p = p; \
-		int      _i = i; \
+		uint64_t* _p = (uint64_t*) p; \
+		int       _i = i; \
 \
-		*(uint64_t*) (_p + _i); \
+		_p[_i]; \
 	})
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	#define GET64(p, i) ({ \
