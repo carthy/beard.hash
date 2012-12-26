@@ -15,6 +15,3 @@
 typedef unsigned long hash_t;
 
 #define HASH_BIT (__SIZEOF_LONG__ * CHAR_BIT)
-
-#define likely(x)   __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)

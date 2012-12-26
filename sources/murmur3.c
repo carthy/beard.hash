@@ -7,31 +7,11 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <common.h>
+#include <helpers.h>
 #include <murmur3.h>
 
 #include <stdlib.h>
 #include <assert.h>
-
-#define ROTL32(a, b) \
-	(((a) << (b)) | ((a) >> (32 - b)))
-
-#define ROTL64(a, b) \
-	(((a) << (b)) | ((a) >> (64 - b)))
-
-#define GET32(p, i) ({ \
-	uint32_t* _p = (uint32_t*) p; \
-	int       _i = i; \
-\
-	_p[_i]; \
-})
-
-#define GET64(p, i) ({ \
-	uint64_t* _p = (uint64_t*) p; \
-	int       _i = i; \
-\
-	_p[_i]; \
-})
 
 #define fmix(h) _Generic((h), \
 	uint32_t: fmix32, \

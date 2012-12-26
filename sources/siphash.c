@@ -7,35 +7,11 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <common.h>
+#include <helpers.h>
 #include <siphash.h>
 
 #include <stdlib.h>
 #include <assert.h>
-
-#define ROTL64(a, b) \
-	(((a) << (b)) | ((a) >> (64 - b)))
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	#define GET64(p, i) ({ \
-		uint64_t* _p = (uint64_t*) p; \
-		int       _i = i; \
-\
-		_p[_i]; \
-	})
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	#define GET64(p, i) ({ \
-		uint8_t* _p = p; \
-		int      _i = i; \
-\
-		((uint64_t) _p[_i + 0] << 56) | ((uint64_t) _p[_i + 1] << 48) | \
-		((uint64_t) _p[_i + 2] << 40) | ((uint64_t) _p[_i + 3] << 32) | \
-		((uint64_t) _p[_i + 4] << 24) | ((uint64_t) _p[_i + 5] << 16) | \
-		((uint64_t) _p[_i + 6] << 8)  | ((uint64_t) _p[_i + 7] << 0) \
-	})
-#else
-	#error "I don't know the size of this endian"
-#endif
 
 hash_t
 siphash (uint8_t key[16], void* buffer, size_t length)
