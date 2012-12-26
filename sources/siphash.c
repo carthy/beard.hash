@@ -193,18 +193,16 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 
 			return self;
 		}
-		else {
-			size_t fill = length - (8 - self->remaining);
 
-			memcpy(self->remainder + self->remaining, buffer, fill);
+		size_t fill = length - (8 - self->remaining);
+		memcpy(self->remainder + self->remaining, buffer, fill);
 
-			self->v[3] ^= GET64(self->remainder, 0);
-			rounds(self, self->compression);
-			self->v[0] ^= GET64(self->remainder, 0);
+		self->v[3] ^= GET64(self->remainder, 0);
+		rounds(self, self->compression);
+		self->v[0] ^= GET64(self->remainder, 0);
 
-			self->remaining  = 0;
-			length          -= fill;
-		}
+		self->remaining  = 0;
+		length          -= fill;
 	}
 
 	size_t i, blocks;
