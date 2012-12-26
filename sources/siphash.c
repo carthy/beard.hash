@@ -204,6 +204,10 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 	assert(self);
 	assert(buffer);
 
+	if (length == 0) {
+		return self;
+	}
+
 	self->length += length;
 
 	if (self->remaining > 0) {
