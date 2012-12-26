@@ -149,12 +149,16 @@ siphash_new (void)
 void
 siphash_free (siphash_t* self)
 {
+	assert(self);
+
 	free(self);
 }
 
 siphash_t*
 siphash_init (siphash_t* self, uint8_t key[16], int compression, int finalization)
 {
+	assert(self);
+
 	uint64_t k0 = GET64(key, 0);
 	uint64_t k1 = GET64(key, 8);
 
@@ -199,6 +203,9 @@ siphash_init_default (siphash_t* self, uint8_t key[16])
 siphash_t*
 siphash_update (siphash_t* self, void* buffer, size_t length)
 {
+	assert(self);
+	assert(buffer);
+
 	self->length += length;
 
 	if (self->remaining > 0) {
@@ -238,6 +245,8 @@ siphash_update (siphash_t* self, void* buffer, size_t length)
 siphash_t*
 siphash_finalize (siphash_t* self)
 {
+	assert(self);
+
 	uint64_t last7 = (self->length & 0xFFull) << 56;
 
 	#if __BYTE_ORDER_ == __ORDER_LITTLE_ENDIAN
@@ -284,5 +293,7 @@ siphash_finalize (siphash_t* self)
 hash_t
 siphash_fetch (siphash_t* self)
 {
+	assert(self);
+
 	return self->hash;
 }
