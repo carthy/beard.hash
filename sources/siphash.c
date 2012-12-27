@@ -100,11 +100,15 @@ siphash (const uint8_t key[16], const void* buffer, size_t length)
 }
 
 struct siphash_t {
+	size_t length;
+
 	int compression;
 	int finalization;
 
-	uint64_t v[4];
-	size_t   length;
+	uint64_t v0;
+	uint64_t v1;
+	uint64_t v2;
+	uint64_t v3;
 
 	uint8_t remaining;
 	uint8_t remainder[8];
@@ -134,10 +138,10 @@ siphash_init (siphash_t* self, const uint8_t key[16], int compression, int final
 	uint64_t k0 = GET64(key, 0);
 	uint64_t k1 = GET64(key, 8);
 
-	self->v[0] = k0 ^ 0x736F6D6570736575ull;
-	self->v[1] = k1 ^ 0x646F72616E646F6Dull;
-	self->v[2] = k0 ^ 0x6C7967656E657261ull;
-	self->v[3] = k1 ^ 0x7465646279746573ull;
+	self->v0 = k0 ^ 0x736F6D6570736575ull;
+	self->v1 = k1 ^ 0x646F72616E646F6Dull;
+	self->v2 = k0 ^ 0x6C7967656E657261ull;
+	self->v3 = k1 ^ 0x7465646279746573ull;
 
 	self->length = 0;
 
@@ -158,14 +162,14 @@ siphash_init_default (siphash_t* self, const uint8_t key[16])
 }
 
 #define round(state) \
-	state->v[0] += state->v[1]; state->v[2] += state->v[3]; \
-	state->v[1]  = ROTL64(state->v[1], 13); state->v[3] = ROTL64(state->v[3], 16); \
-	state->v[1] ^= state->v[0]; state->v[3] ^= state->v[2]; \
-	state->v[0]  = ROTL64(state->v[0], 32); \
-	state->v[2] += state->v[1]; state->v[0] += state->v[3]; \
-	state->v[1]  = ROTL64(state->v[1], 17); state->v[3] = ROTL64(state->v[3], 21); \
-	state->v[1] ^= state->v[2]; state->v[3] ^= state->v[0]; \
-	state->v[2]  = ROTL64(state->v[2], 32)
+	state->v0 += state->v1; state->v2 += state->v3; \
+	state->v1  = ROTL64(state->v1, 13); state->v3 = ROTL64(state->v3, 16); \
+	state->v1 ^= state->v0; state->v3 ^= state->v2; \
+	state->v0  = ROTL64(state->v0, 32); \
+	state->v2 += state->v1; state->v0 += state->v3; \
+	state->v1  = ROTL64(state->v1, 17); state->v3 = ROTL64(state->v3, 21); \
+	state->v1 ^= state->v2; state->v3 ^= state->v0; \
+	state->v2  = ROTL64(state->v2, 32)
 
 #define rounds(state, n) \
 	for (size_t i = 0; i < n; i++) { \
@@ -195,9 +199,9 @@ siphash_update (siphash_t* self, const void* buffer, size_t length)
 		size_t fill = 8 - self->remaining;
 		memcpy(self->remainder + self->remaining, buffer, fill);
 
-		self->v[3] ^= GET64(self->remainder, 0);
+		self->v3 ^= GET64(self->remainder, 0);
 		rounds(self, self->compression);
-		self->v[0] ^= GET64(self->remainder, 0);
+		self->v0 ^= GET64(self->remainder, 0);
 
 		self->remaining  = 0;
 		length          -= fill;
@@ -206,9 +210,9 @@ siphash_update (siphash_t* self, const void* buffer, size_t length)
 
 	size_t i, blocks;
 	for (i = 0, blocks = length & ~7; i < blocks; i += 8) {
-		self->v[3] ^= GET64(buffer, i);
+		self->v3 ^= GET64(buffer, i);
 		rounds(self, self->compression);
-		self->v[0] ^= GET64(buffer, i);
+		self->v0 ^= GET64(buffer, i);
 	}
 
 	self->remaining = length - blocks;
@@ -242,17 +246,17 @@ siphash_final (siphash_t* self)
 				case 1: last7 |= ((uint64_t) self->remainder[INDEX_FOR(0)]);
 			}
 
-			self->v[3] ^= last7;
+			self->v3 ^= last7;
 			rounds(self, self->compression);
-			self->v[0] ^= last7;
+			self->v0 ^= last7;
 		}
 		#undef INDEX_FOR
 	}
 
-	self->v[2] ^= 0xFF;
+	self->v2 ^= 0xFF;
 	rounds(self, self->finalization);
 
-	uint64_t hash = self->v[0] ^ self->v[1] ^ self->v[2] ^ self->v[3];
+	uint64_t hash = self->v0 ^ self->v1 ^ self->v2 ^ self->v3;
 
 	#if HASH_BIT == 32
 		self->hash = (hash >> 32) ^ (hash & 0xFFFFFFFF);
