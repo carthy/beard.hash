@@ -19,7 +19,7 @@ crapwow (hash_t seed, const void* buffer, size_t length)
 	#if HASH_BIT == 32
 		uint32_t  m   = 0x57559429;
 		uint32_t  n   = 0x5052ACDB;
-		uint32_t* buf = buffer;
+		uint32_t* buf = (uint32_t*) buffer;
 		uint32_t  h   = length;
 		uint32_t  k   = length + seed + n;
 
