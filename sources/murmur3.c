@@ -70,7 +70,7 @@ murmur3 (hash_t seed, const void* buffer, size_t length)
 			#error "I don't see any gigantic endian."
 		#endif
 		{
-			uint8_t* buf = buffer;
+			uint8_t* buf = (uint8_t*) buffer;
 			uint32_t k1  = 0;
 
 			switch (length - blocks) {
