@@ -225,6 +225,10 @@ murmur3_init (murmur3_t* self, hash_t seed)
 		#error "Why can't I hold so many bits?"
 	#endif
 
+	self->remaining = 0;
+
+	self->hash = 0;
+
 	return self;
 }
 
